@@ -1,0 +1,46 @@
+.input {
+  outline: none;
+  line-height: 2;
+  padding: 3px 8px;
+  border-width: 1px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.inputContainer {
+  display: block;
+
+  &.pass {
+    .input {
+      border-color: green;
+    }
+  }
+
+  &.default {
+    .input {
+      border: 1px solid #000;
+
+      &:focus {
+        border: 1px solid #eee;
+      }
+    }
+  }
+
+  &.error {
+    .input {
+      border-color: red;
+    }
+  }
+}
+
+.name {
+  display: block;
+}
+
+.default {
+  display: block;
+}
+
+.input {
+  display: block;
+}
