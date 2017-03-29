@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import TextInput from '../src/text_input/TextInput';
+import ChoiceInput from '../src/choice_input/ChoiceInput';
+
 import S from './index.scss';
 
 class Example extends Component {
   state = {
     name: 'Jack',
     job: '',
-    desc: 'I\'m Jack'
+    desc: 'I\'m Jack',
+    gender: '0',
+    hobby: '123|234'
   }
 
   changeHandle = (name, value) => {
@@ -16,7 +20,7 @@ class Example extends Component {
 
   render() {
     return (
-      <div className={S.example}>
+      <form className={S.example} method="POST">
         <TextInput
           name="name"
           className="input"
@@ -38,7 +42,30 @@ class Example extends Component {
           value={this.state.desc}
           rules={['required']}
         />
-      </div>
+        <h4>性别</h4>
+        <ChoiceInput
+          name="gender"
+          value={this.state.gender}
+          options={[
+            { label: 'Male', value: '0' },
+            { label: 'Female', value: '1' }
+          ]}
+          onChange={value => this.changeHandle('gender', value)}
+        />
+        <h4>爱好</h4>
+        <ChoiceInput
+          name="hobby"
+          value={this.state.hobby}
+          multiple
+          options={[
+            { label: 'play', value: '123' },
+            { label: 'music', value: '234' },
+            { label: 'book', value: '456' }
+          ]}
+          onChange={value => this.changeHandle('hobby', value)}
+        />
+        <input type="submit" value="POST" />
+      </form>
     );
   }
 }

@@ -16,32 +16,28 @@ class TextInput extends Component {
     msg: ''
   }
 
-  handleChange = e => {
+  changeHandle = e => {
     const { rules, onChange } = this.props;
     const new_value = e.target.value;
+    onChange(new_value);
 
-    if (typeof rules === 'undefined') {
-      onChange(new_value);
-    } else {
-      validation(new_value, rules, result => {
-        const { isPass, msg } = result;
-        this.setState({ msg, status: isPass ? 'pass' : 'error' }, () => {
-          onChange(new_value);
-        });
-      });
-    }
+    if (typeof rules === 'undefined') return;
+    validation(new_value, rules, result => {
+      const { isPass, msg } = result;
+      this.setState({ msg, status: isPass ? 'pass' : 'error' });
+    });
   }
 
   render() {
-    const { rules, value, className, disabled, multiline, onChange, ...others } = this.props;
+    const { value, className, disabled, multiline, name } = this.props;
     const { status, msg } = this.state;
 
     const inputElementProps = {
+      name,
       className: S.input,
-      onChange: this.handleChange,
+      onChange: this.changeHandle,
       disabled,
-      value,
-      ...others
+      value
     };
 
     const messageElement = <div className="message">{msg}</div>;
@@ -58,6 +54,7 @@ class TextInput extends Component {
 }
 
 TextInput.propTypes = {
+  name: PropTypes.string,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,

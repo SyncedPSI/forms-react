@@ -5,6 +5,7 @@
   border-width: 1px;
   border-radius: 3px;
   font-size: 14px;
+  resize: none;
 }
 
 .inputContainer {
@@ -19,6 +20,7 @@
   &.default {
     .input {
       border: 1px solid #000;
+      transition: all 0.3s;
 
       &:focus {
         border: 1px solid #eee;
