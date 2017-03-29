@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import indexOf from 'lodash/indexOf';
 
+import Switch from '../switch/Switch';
+
 import S from './choice_input.scss';
 
 class ChoiceInput extends Component {
@@ -12,10 +14,10 @@ class ChoiceInput extends Component {
     onChange: () => {}
   }
 
-  changeHandle = e => {
+  valueHandle = v => {
     const { onChange, multiple, value } = this.props;
     const arr = value.split('|');
-    const targetValue = e.target.value;
+    const targetValue = v;
 
     if (multiple) {
       const index = indexOf(arr, targetValue);
@@ -36,8 +38,12 @@ class ChoiceInput extends Component {
       const checked = indexOf(arr, item.value) >= 0;
 
       return (
-        <div className={S.radioItem} key={index}>
-          <input name={name} type={multiple ? 'checkbox' : 'radio'} checked={checked} value={item.value} onChange={this.changeHandle} />
+        <div className={S.radioItem} key={index} onClick={() => this.valueHandle(item.value)}>
+          <Switch
+            checked={checked}
+            type={multiple ? 'square' : 'circle'}
+          />
+          <input name={name} type={multiple ? 'checkbox' : 'radio'} checked={checked} value={item.value} onChange={() => this.valueHandle(item.value)} />
           {item.label}
         </div>
       );

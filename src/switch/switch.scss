@@ -1,0 +1,27 @@
+.switch {
+  display: inline-block;
+
+  .circleWrapper {
+    width: 20px;
+    height: 20px;
+    background-color: #000;
+    border-radius: 50%;
+  }
+
+  .squareWrapper {
+    width: 20px;
+    height: 20px;
+    background-color: #000;
+  }
+
+  &.checked {
+
+    .circleWrapper {
+      background-color: red;
+    }
+
+    .squareWrapper  {
+      background-color: red;
+    }
+  }
+}
