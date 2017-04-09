@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import S from './switch.scss';
+import S from './theme.scss';
 
 const Switch = props => {
   const { className, checked, onClick, type } = props;

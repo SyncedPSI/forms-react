@@ -3,7 +3,7 @@ import indexOf from 'lodash/indexOf';
 
 import Switch from '../switch/Switch';
 
-import S from './choice_input.scss';
+import S from './theme.scss';
 
 class ChoiceInput extends Component {
   static defaultProps = {

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 import TextInput from '../src/text_input/TextInput';
 import ChoiceInput from '../src/choice_input/ChoiceInput';
+import Select from '../src/select/Select';
 
 import S from './index.scss';
 
@@ -11,7 +12,8 @@ class Example extends Component {
     job: '',
     desc: 'I\'m Jack',
     gender: '0',
-    hobby: '123|234'
+    hobby: '123|234',
+    city: '北京'
   }
 
   changeHandle = (name, value) => {
@@ -63,6 +65,16 @@ class Example extends Component {
             { label: 'book', value: '456' }
           ]}
           onChange={value => this.changeHandle('hobby', value)}
+        />
+        <Select
+          name="city"
+          value={this.state.city}
+          options={[
+            { label: '北京', value: '北京' },
+            { label: '上海', value: '上海' },
+            { label: '广州', value: '广州' }
+          ]}
+          onChange={value => this.changeHandle('city', value)}
         />
         <input type="submit" value="POST" />
       </form>

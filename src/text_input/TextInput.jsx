@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import { validation } from 'value-validate';
-import S from './text_input.scss';
+import S from './theme.scss';
 
 class TextInput extends Component {
   static defaultProps = {
