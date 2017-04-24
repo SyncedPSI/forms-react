@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import indexOf from 'lodash/indexOf';
 import find from 'lodash/find';
+import isArray from 'lodash/isArray';
 
 import S from './theme.scss';
 
@@ -13,55 +14,97 @@ class Select extends Component {
     onChange: () => {}
   }
 
+  constructor(props) {
+    super(props);
+    if (!document.addEventListener && document.attachEvent) {
+      document.attachEvent('click', this.handleTouchOutside);
+    } else {
+      document.addEventListener('click', this.handleTouchOutside);
+    }
+  }
+
   state = {
     show: false
   }
 
-  getLabel = v => {
-    const { options } = this.props;
-    const o = find(options, ['value', v]);
-    return o.label;
+  componentWillUnmount() {
+    if (!document.removeEventListener && document.detachEvent) {
+      document.detachEvent('click', this.handleTouchOutside);
+    } else {
+      document.removeEventListener('click', this.handleTouchOutside);
+    }
   }
 
-  valueHandle = v => {
-    const { onChange } = this.props;
+  getLabel = v => {
+    const { options } = this.props;
+
+    if (isArray(v)) {
+      return v.map((item, index) => {
+        const o = find(options, ['value', item]);
+        return <span key={index}>{o.label}</span>;
+      });
+    }
+
+    const o = find(options, ['value', v]);
+    return <span>{o.label}</span>;
+  }
+
+  valueHandle = (v, position, checked) => {
+    const { onChange, multiple, value } = this.props;
     this.setState({ show: false });
-    onChange(v);
+    let newValue;
+
+    if (multiple) {
+      newValue = [...value];
+      if (checked) {
+        newValue.splice(position, 1);
+      } else {
+        newValue.push(v);
+      }
+    } else {
+      newValue = v;
+    }
+    onChange(newValue);
+  }
+
+
+  handleTouchOutside = event => {
+    if (this.wrapper && !this.wrapper.contains(event.target)) {
+      this.setState({ show: false });
+    }
   }
 
   render() {
-    const { options, className, name, multiple, value } = this.props;
+    const { options, className, name, value } = this.props;
 
-    const arr = value.split('|');
     const customElementList = options.map((item, index) => {
-      const checked = indexOf(arr, item.value) >= 0;
+      const position = indexOf(value, item.value);
+      const checked = position >= 0;
 
       return (
-        <div key={index} className={`${S.item} ${checked ? S.checked : ''}`} onClick={() => this.valueHandle(item.value)}>
+        <div key={index} className={`${S.item} ${checked ? S.checked : ''}`} onClick={() => this.valueHandle(item.value, position, checked)}>
           {item.label}
         </div>
       );
     });
 
-    const optionsElementList = options.map((item, index) => {
-      const checked = indexOf(arr, item.value) >= 0;
-
-      return (
-        <option key={index} value={item.value} selected={checked}>{item.label}</option>
-      );
-    });
-
     return (
-      <div className={`${S.selectContainer} ${className}`}>
-        <div className={S.box} onClick={() => this.setState({ show: !this.state.show })}>
-          <span>{this.getLabel(value)}</span>
+      <div className={`${S.selectContainer} ${className}`} ref={ref => (this.wrapper = ref)}>
+        <div>
+          {this.getLabel(value)}
         </div>
+        <input
+          className={S.box}
+          onClick={() => this.setState({ show: true })}
+        />
         <div className={`${S.list} ${this.state.show ? S.show : S.hide}`}>
           {customElementList}
         </div>
-        <select name={name} multiple={multiple} onChange={e => this.valueHandle(e.target.value)}>
-          {optionsElementList}
-        </select>
+        {
+          value.map((item, index) => {
+            return <input name={name} value={item} key={index} type="hidden" />;
+          })
+        }
       </div>
     );
   }
@@ -70,7 +113,10 @@ class Select extends Component {
 Select.propTypes = {
   className: PropTypes.string,
   name: PropTypes.string,
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.array
+  ]),
   onChange: PropTypes.func,
   options: PropTypes.arrayOf(PropTypes.object),
   multiple: PropTypes.bool

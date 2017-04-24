@@ -13,7 +13,7 @@ class Example extends Component {
     desc: 'I\'m Jack',
     gender: '0',
     hobby: '123|234',
-    city: '北京'
+    city: ['北京', '上海']
   }
 
   changeHandle = (name, value) => {
@@ -69,6 +69,7 @@ class Example extends Component {
         <Select
           name="city"
           value={this.state.city}
+          multiple
           options={[
             { label: '北京', value: '北京' },
             { label: '上海', value: '上海' },
