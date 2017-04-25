@@ -1,14 +1,18 @@
 import React, { Component, PropTypes } from 'react';
 import indexOf from 'lodash/indexOf';
 import find from 'lodash/find';
-import isArray from 'lodash/isArray';
+import filter from 'lodash/filter';
+import isEmpty from 'lodash/isEmpty';
+import includes from 'lodash/includes';
 
 import S from './theme.scss';
 
 class Select extends Component {
   static defaultProps = {
     className: '',
-    multiple: false,
+    isMultiple: false,
+    isFilter: false,
+    hasSearch: true,
     value: '',
     options: [],
     onChange: () => {}
@@ -24,7 +28,13 @@ class Select extends Component {
   }
 
   state = {
-    show: false
+    show: false,
+    options: this.props.options,
+    value: this.props.value
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ options: nextProps.options, value: nextProps.value });
   }
 
   componentWillUnmount() {
@@ -35,38 +45,124 @@ class Select extends Component {
     }
   }
 
-  getLabel = v => {
-    const { options } = this.props;
+  getLabel = () => {
+    const { options, isMultiple } = this.props;
+    const { value } = this.state;
 
-    if (isArray(v)) {
-      return v.map((item, index) => {
+    if (isMultiple) {
+      return value.map((item, index) => {
         const o = find(options, ['value', item]);
-        return <span key={index}>{o.label}</span>;
+        return (
+          <span key={index}>
+            {o.label}
+            <a href="javascript:;" onClick={e => {
+              e.stopPropagation();
+              e.nativeEvent.stopImmediatePropagation();
+
+              this.removeValue(o.value);
+            }}>关闭</a>
+          </span>
+        );
       });
     }
 
-    const o = find(options, ['value', v]);
+    const o = find(options, ['value', value]);
     return <span>{o.label}</span>;
   }
 
-  valueHandle = (v, position, checked) => {
-    const { onChange, multiple, value } = this.props;
-    this.setState({ show: false });
-    let newValue;
+  getInput = () => {
+    const { name, isMultiple } = this.props;
+    const { value } = this.state;
 
-    if (multiple) {
-      newValue = [...value];
-      if (checked) {
-        newValue.splice(position, 1);
-      } else {
-        newValue.push(v);
-      }
-    } else {
-      newValue = v;
+    if (isMultiple) {
+      return value.map((item, index) => {
+        return <input name={name} value={item} key={index} type="hidden" />;
+      });
     }
+
+    return <input name={name} value={value} type="hidden" />;
+  }
+
+  getElementList = () => {
+    const { isFilter } = this.props;
+    const { options, value } = this.state;
+
+    if (isEmpty(options)) {
+      return (
+        <span>No Result</span>
+      );
+    }
+
+    const newOptions = isFilter ? this.filterOptions() : options;
+    const elementList = newOptions.map((item, index) => {
+      const position = indexOf(value, item.value);
+      const checked = position >= 0 || value === item.value;
+
+      return (
+        <div key={index} className={`${S.item} ${checked ? S.checked : ''}`} onClick={() => this.valueHandle(item.value, checked)}>
+          {item.label}
+        </div>
+      );
+    });
+
+    return elementList;
+  }
+
+  removeValue = v => {
+    const { onChange } = this.props;
+    const { value } = this.state;
+    const position = indexOf(value, v);
+    const newValue = [...value];
+    newValue.splice(position, 1);
+
+    this.setState({ value: newValue });
     onChange(newValue);
   }
 
+  addValue = v => {
+    const { onChange } = this.props;
+    const { value } = this.state;
+    const newValue = [...value];
+    newValue.push(v);
+
+    this.setState({ value: newValue });
+    onChange(newValue);
+  }
+
+  filterOptions = () => {
+    const { isMultiple } = this.props;
+    const { options, value } = this.state;
+
+    if (isMultiple) {
+      return value.reduce((result, current) => {
+        return filter(result, item => item.value !== current);
+      }, options);
+    }
+
+    return filter(options, item => item.value !== value);
+  }
+
+  valueHandle = (v, checked) => {
+    const { onChange, isMultiple } = this.props;
+
+    if (isMultiple) {
+      if (checked) {
+        this.removeValue(v);
+      } else {
+        this.addValue(v);
+      }
+    } else {
+      this.setState({ show: false, value: v });
+      onChange(v);
+    }
+  }
+
+  searchHandle = e => {
+    if (!this.props.hasSearch) return;
+    const label = e.target.value;
+    const newOptions = !isEmpty(label) ? filter(this.props.options, item => includes(item.label, label)) : this.props.options;
+    this.setState({ options: newOptions });
+  }
 
   handleTouchOutside = event => {
     if (this.wrapper && !this.wrapper.contains(event.target)) {
@@ -75,40 +171,27 @@ class Select extends Component {
   }
 
   render() {
-    const { options, className, name, value } = this.props;
-
-    const customElementList = options.map((item, index) => {
-      const position = indexOf(value, item.value);
-      const checked = position >= 0;
-
-      return (
-        <div key={index} className={`${S.item} ${checked ? S.checked : ''}`} onClick={() => this.valueHandle(item.value, position, checked)}>
-          {item.label}
-        </div>
-      );
-    });
+    const { className } = this.props;
 
     return (
       <div className={`${S.selectContainer} ${className}`} ref={ref => (this.wrapper = ref)}>
         <div>
-          {this.getLabel(value)}
+          {this.getLabel()}
         </div>
         <input
           className={S.box}
           onClick={() => this.setState({ show: true })}
+          onChange={this.searchHandle}
         />
         <div className={`${S.list} ${this.state.show ? S.show : S.hide}`}>
-          {customElementList}
+          {this.getElementList()}
         </div>
-        {
-          value.map((item, index) => {
-            return <input name={name} value={item} key={index} type="hidden" />;
-          })
-        }
+        {this.getInput()}
       </div>
     );
   }
 }
+
 
 Select.propTypes = {
   className: PropTypes.string,
@@ -119,7 +202,9 @@ Select.propTypes = {
   ]),
   onChange: PropTypes.func,
   options: PropTypes.arrayOf(PropTypes.object),
-  multiple: PropTypes.bool
+  isMultiple: PropTypes.bool,
+  isFilter: PropTypes.bool,
+  hasSearch: PropTypes.bool
 };
 
 export default Select;

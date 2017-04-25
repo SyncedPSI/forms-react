@@ -13,7 +13,8 @@ class Example extends Component {
     desc: 'I\'m Jack',
     gender: '0',
     hobby: '123|234',
-    city: ['北京', '上海']
+    city: ['北京', '上海'],
+    avatar: '北京'
   }
 
   changeHandle = (name, value) => {
@@ -69,13 +70,22 @@ class Example extends Component {
         <Select
           name="city"
           value={this.state.city}
-          multiple
+          isFilter
+          isMultiple
           options={[
             { label: '北京', value: '北京' },
             { label: '上海', value: '上海' },
             { label: '广州', value: '广州' }
           ]}
-          onChange={value => this.changeHandle('city', value)}
+        />
+        <Select
+          name="avatar"
+          value={this.state.avatar}
+          options={[
+            { label: '北京', value: '北京' },
+            { label: '上海', value: '上海' },
+            { label: '广州', value: '广州' }
+          ]}
         />
         <input type="submit" value="POST" />
       </form>
