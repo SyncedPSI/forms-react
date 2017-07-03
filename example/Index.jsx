@@ -67,25 +67,30 @@ class Example extends Component {
           ]}
           onChange={value => this.changeHandle('hobby', value)}
         />
+        <h4>爱好</h4>
         <Select
           name="city"
           value={this.state.city}
-          isFilter
           isMultiple
+          isFilter
           options={[
             { label: '北京', value: '北京' },
             { label: '上海', value: '上海' },
             { label: '广州', value: '广州' }
           ]}
+          onChange={value => this.changeHandle('city', value)}
         />
+        <h4>爱好</h4>
         <Select
           name="avatar"
           value={this.state.avatar}
+          isFilter
           options={[
             { label: '北京', value: '北京' },
             { label: '上海', value: '上海' },
             { label: '广州', value: '广州' }
           ]}
+          onChange={value => this.changeHandle('avatar', value)}
         />
         <input type="submit" value="POST" />
       </form>

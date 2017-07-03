@@ -28,13 +28,7 @@ class Select extends Component {
   }
 
   state = {
-    show: false,
-    options: this.props.options,
-    value: this.props.value
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({ options: nextProps.options, value: nextProps.value });
+    show: false
   }
 
   componentWillUnmount() {
@@ -46,8 +40,7 @@ class Select extends Component {
   }
 
   getLabel = () => {
-    const { options, isMultiple } = this.props;
-    const { value } = this.state;
+    const { options, isMultiple, value } = this.props;
 
     if (isMultiple) {
       return value.map((item, index) => {
@@ -71,8 +64,7 @@ class Select extends Component {
   }
 
   getInput = () => {
-    const { name, isMultiple } = this.props;
-    const { value } = this.state;
+    const { name, isMultiple, value } = this.props;
 
     if (isMultiple) {
       return value.map((item, index) => {
@@ -84,8 +76,7 @@ class Select extends Component {
   }
 
   getElementList = () => {
-    const { isFilter } = this.props;
-    const { options, value } = this.state;
+    const { isFilter, options, value } = this.props;
 
     if (isEmpty(options)) {
       return (
@@ -109,29 +100,24 @@ class Select extends Component {
   }
 
   removeValue = v => {
-    const { onChange } = this.props;
-    const { value } = this.state;
+    const { onChange, value } = this.props;
     const position = indexOf(value, v);
     const newValue = [...value];
-    newValue.splice(position, 1);
 
-    this.setState({ value: newValue });
+    newValue.splice(position, 1);
     onChange(newValue);
   }
 
   addValue = v => {
-    const { onChange } = this.props;
-    const { value } = this.state;
+    const { onChange, value } = this.props;
     const newValue = [...value];
-    newValue.push(v);
 
-    this.setState({ value: newValue });
+    newValue.push(v);
     onChange(newValue);
   }
 
   filterOptions = () => {
-    const { isMultiple } = this.props;
-    const { options, value } = this.state;
+    const { isMultiple, options, value } = this.props;
 
     if (isMultiple) {
       return value.reduce((result, current) => {
